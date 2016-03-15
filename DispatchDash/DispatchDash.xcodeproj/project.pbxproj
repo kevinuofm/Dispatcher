@@ -15,6 +15,7 @@
 		59CFF1CE1C8E546B0008E545 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 59CFF1CC1C8E546B0008E545 /* LaunchScreen.storyboard */; };
 		59CFF1D91C8E546B0008E545 /* DispatchDashTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59CFF1D81C8E546B0008E545 /* DispatchDashTests.swift */; };
 		59CFF1E41C8E546B0008E545 /* DispatchDashUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59CFF1E31C8E546B0008E545 /* DispatchDashUITests.swift */; };
+		59CFF1F21C8E5CBB0008E545 /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 59CFF1F11C8E5CBB0008E545 /* MapKit.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -49,6 +50,7 @@
 		59CFF1DF1C8E546B0008E545 /* DispatchDashUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DispatchDashUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		59CFF1E31C8E546B0008E545 /* DispatchDashUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DispatchDashUITests.swift; sourceTree = "<group>"; };
 		59CFF1E51C8E546B0008E545 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		59CFF1F11C8E5CBB0008E545 /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -57,6 +59,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				046DEC2C1C8E5C7200B8F0FC /* MapKit.framework in Frameworks */,
+				59CFF1F21C8E5CBB0008E545 /* MapKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -81,6 +84,7 @@
 			isa = PBXGroup;
 			children = (
 				046DEC2B1C8E5C7200B8F0FC /* MapKit.framework */,
+				59CFF1F11C8E5CBB0008E545 /* MapKit.framework */,
 				59CFF1C21C8E546B0008E545 /* DispatchDash */,
 				59CFF1D71C8E546B0008E545 /* DispatchDashTests */,
 				59CFF1E21C8E546B0008E545 /* DispatchDashUITests */,
