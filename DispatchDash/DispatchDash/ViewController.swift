@@ -13,7 +13,6 @@ import CoreLocation
 class ViewController: UIViewController, MKMapViewDelegate {
     
     @IBOutlet weak var myMap: MKMapView!
-    @IBOutlet weak var carButtonView: MKAnnotationView!
     
     var myRoute : MKRoute?
     
@@ -26,20 +25,29 @@ class ViewController: UIViewController, MKMapViewDelegate {
         point1 = MKPointAnnotation()
         point2 = MKPointAnnotation()
         
-        point1.coordinate = CLLocationCoordinate2DMake(25.0305, 121.5360)
+        
+        point1.coordinate = CLLocationCoordinate2DMake(37.773692,-122.4297367)
         point1.title = "Taipei"
         point1.subtitle = "Taiwan"
         myMap.addAnnotation(point1)
         
-        point2.coordinate = CLLocationCoordinate2DMake(24.9511, 121.2358)
+        point2.coordinate = CLLocationCoordinate2DMake(37.7585679,-122.4125813)
         point2.title = "Chungli"
         point2.subtitle = "Taiwan"
         myMap.addAnnotation(point2)
         myMap.centerCoordinate = point2.coordinate
         myMap.delegate = self
         
+        let car = Car(
+            title: "test",
+            coordinate: CLLocationCoordinate2DMake(37.7636844,-122.4216257),
+            passengers: [],
+            waypoints: [])
+        
+        myMap.addAnnotation(car)
+        
         //Span of the map
-        myMap.setRegion(MKCoordinateRegionMake(point2.coordinate, MKCoordinateSpanMake(0.7,0.7)), animated: true)
+        myMap.setRegion(MKCoordinateRegionMake(point2.coordinate, MKCoordinateSpanMake(0.1,0.1)), animated: true)
         
         let directionsRequest = MKDirectionsRequest()
         let markTaipei = MKPlacemark(coordinate: CLLocationCoordinate2DMake(point1.coordinate.latitude, point1.coordinate.longitude), addressDictionary: nil)
@@ -66,6 +74,25 @@ class ViewController: UIViewController, MKMapViewDelegate {
         return myLineRenderer
     }
     
+    func mapView(mapView: MKMapView, viewForAnnotation annotation: MKAnnotation) -> MKAnnotationView? {
+        if let annotation = annotation as? Car {
+            let identifier = "pin"
+            var view: MKPinAnnotationView
+            if let dequeuedView = mapView.dequeueReusableAnnotationViewWithIdentifier(identifier)
+                as? MKPinAnnotationView { // 2
+                    dequeuedView.annotation = annotation
+                    view = dequeuedView
+            } else {
+                // 3
+                view = MKPinAnnotationView(annotation: annotation, reuseIdentifier: identifier)
+                view.canShowCallout = true
+                view.calloutOffset = CGPoint(x: -5, y: 5)
+                view.rightCalloutAccessoryView = UIButton(type: .DetailDisclosure) as UIView
+            }
+            return view
+        }
+        return nil
+    }
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()

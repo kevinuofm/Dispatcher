@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		046DEC2C1C8E5C7200B8F0FC /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 046DEC2B1C8E5C7200B8F0FC /* MapKit.framework */; };
+		04F456791C99BCCB005728A3 /* Car.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04F456781C99BCCB005728A3 /* Car.swift */; };
 		59CFF1C41C8E546B0008E545 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59CFF1C31C8E546B0008E545 /* AppDelegate.swift */; };
 		59CFF1C61C8E546B0008E545 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59CFF1C51C8E546B0008E545 /* ViewController.swift */; };
 		59CFF1C91C8E546B0008E545 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 59CFF1C71C8E546B0008E545 /* Main.storyboard */; };
@@ -37,6 +38,7 @@
 
 /* Begin PBXFileReference section */
 		046DEC2B1C8E5C7200B8F0FC /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
+		04F456781C99BCCB005728A3 /* Car.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Car.swift; sourceTree = "<group>"; };
 		59CFF1C01C8E546B0008E545 /* DispatchDash.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DispatchDash.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		59CFF1C31C8E546B0008E545 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		59CFF1C51C8E546B0008E545 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -107,6 +109,7 @@
 			children = (
 				59CFF1C31C8E546B0008E545 /* AppDelegate.swift */,
 				59CFF1C51C8E546B0008E545 /* ViewController.swift */,
+				04F456781C99BCCB005728A3 /* Car.swift */,
 				59CFF1C71C8E546B0008E545 /* Main.storyboard */,
 				59CFF1CA1C8E546B0008E545 /* Assets.xcassets */,
 				59CFF1CC1C8E546B0008E545 /* LaunchScreen.storyboard */,
@@ -271,6 +274,7 @@
 			files = (
 				59CFF1C61C8E546B0008E545 /* ViewController.swift in Sources */,
 				59CFF1C41C8E546B0008E545 /* AppDelegate.swift in Sources */,
+				04F456791C99BCCB005728A3 /* Car.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
