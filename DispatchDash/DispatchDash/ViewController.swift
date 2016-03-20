@@ -13,29 +13,22 @@ import CoreLocation
 class ViewController: UIViewController, MKMapViewDelegate {
     
     @IBOutlet weak var myMap: MKMapView!
+    @IBOutlet weak var pauseResumeButton: UIButton!
     
     var myRoute : MKRoute?
     
-    var point1 : MKPointAnnotation!
-    var point2 : MKPointAnnotation!
+    var gameTimer: NSTimer!
+    var isPaused = true
+    var passengerViews = [Passenger:PassengerView]()
+    var carViews = [Car]()
+    var currentSelectedView: MKAnnotationView!
+    var currentSelectedOverlays = [MKRoute]()
+    let mapCenter = CLLocationCoordinate2DMake(37.773692,-122.4297367)
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        point1 = MKPointAnnotation()
-        point2 = MKPointAnnotation()
-        
-        
-        point1.coordinate = CLLocationCoordinate2DMake(37.773692,-122.4297367)
-        point1.title = "Taipei"
-        point1.subtitle = "Taiwan"
-        myMap.addAnnotation(point1)
-        
-        point2.coordinate = CLLocationCoordinate2DMake(37.7585679,-122.4125813)
-        point2.title = "Chungli"
-        point2.subtitle = "Taiwan"
-        myMap.addAnnotation(point2)
-        myMap.centerCoordinate = point2.coordinate
+        myMap.centerCoordinate = mapCenter
         myMap.delegate = self
         
         let car = Car(
@@ -46,52 +39,184 @@ class ViewController: UIViewController, MKMapViewDelegate {
         
         myMap.addAnnotation(car)
         
+        addRandomPassenger()
+        
         //Span of the map
-        myMap.setRegion(MKCoordinateRegionMake(point2.coordinate, MKCoordinateSpanMake(0.1,0.1)), animated: true)
+        myMap.setRegion(MKCoordinateRegionMake(mapCenter, MKCoordinateSpanMake(0.1,0.1)), animated: true)
         
-        let directionsRequest = MKDirectionsRequest()
-        let markTaipei = MKPlacemark(coordinate: CLLocationCoordinate2DMake(point1.coordinate.latitude, point1.coordinate.longitude), addressDictionary: nil)
-        let markChungli = MKPlacemark(coordinate: CLLocationCoordinate2DMake(point2.coordinate.latitude, point2.coordinate.longitude), addressDictionary: nil)
         
-        directionsRequest.source = MKMapItem(placemark: markChungli)
-        directionsRequest.destination = MKMapItem(placemark: markTaipei)
+        onPauseResume(pauseResumeButton)
+    }
+    
+    func onTick(timer: NSTimer) {
         
-        directionsRequest.transportType = MKDirectionsTransportType.Automobile
-        let directions = MKDirections(request: directionsRequest)
-        
-        directions.calculateDirectionsWithCompletionHandler { (response:MKDirectionsResponse?, error:NSError?) -> Void in
-            if error == nil {
-                self.myRoute = response!.routes[0]
-                self.myMap.addOverlay((self.myRoute?.polyline)!)
+        for (p, pv) in passengerViews {
+            p.onTick(timer)
+            if p.isPaxLapsed {
+                myMap.removeAnnotation(p)
+                passengerViews.removeValueForKey(p)
+                myMap.removeOverlay(p.mapRoute.polyline)
+            } else {
+                pv.setNeedsDisplay()
             }
+        }
+        
+    }
+    
+    func addRandomPassenger() -> Passenger {
+        let pickupLocation = CLLocationCoordinate2DMake(37.773692,-122.4297367)
+        let dropoffLocation = CLLocationCoordinate2DMake(37.7585679,-122.4125813)
+        
+        let pax = Passenger(
+            title: "pax",
+            coordinate: pickupLocation,
+            pickupLocation: pickupLocation,
+            dropoffLocation: dropoffLocation)
+    
+        
+        pax.directions.calculateDirectionsWithCompletionHandler {
+            (response:MKDirectionsResponse?, error:NSError?) -> Void in
+            if error == nil {
+                pax.mapRoute = response!.routes[0]
+                self.myMap.addOverlay(pax.mapRoute.polyline)
+            }
+        }
+        
+        myMap.addAnnotation(pax)
+        passengerViews[pax] = nil
+        
+        return pax
+    }
+    
+    
+    @IBAction func onPauseResume(sender: UIButton) {
+        if self.isPaused {
+            gameTimer = NSTimer.scheduledTimerWithTimeInterval(0.4, target: self, selector: "onTick:", userInfo: nil, repeats: true)
+            
+            sender.setTitle("Pause", forState: .Normal)
+            isPaused = false
+        } else {
+            gameTimer.invalidate()
+            sender.setTitle("Resume", forState: .Normal)
+            isPaused = true
         }
     }
     
     func mapView(mapView: MKMapView, rendererForOverlay overlay: MKOverlay) -> MKOverlayRenderer {
-        let myLineRenderer = MKPolylineRenderer(polyline: (myRoute?.polyline)!)
-        myLineRenderer.strokeColor = UIColor.redColor()
+        let myLineRenderer = MKPolylineRenderer(polyline: overlay as! MKPolyline)
+        myLineRenderer.strokeColor = UIColor.grayColor()
         myLineRenderer.lineWidth = 3
         return myLineRenderer
     }
     
     func mapView(mapView: MKMapView, viewForAnnotation annotation: MKAnnotation) -> MKAnnotationView? {
         if let annotation = annotation as? Car {
-            let identifier = "pin"
-            var view: MKPinAnnotationView
-            if let dequeuedView = mapView.dequeueReusableAnnotationViewWithIdentifier(identifier)
-                as? MKPinAnnotationView { // 2
-                    dequeuedView.annotation = annotation
-                    view = dequeuedView
-            } else {
+            let identifier = "car"
+            var view: MKAnnotationView
+            
+//            if let dequeuedView = mapView.dequeueReusableAnnotationViewWithIdentifier(identifier)
+//                as? MKAnnotationView { // 2
+//                    dequeuedView.annotation = annotation
+//                    view = dequeuedView
+//            } else {
                 // 3
-                view = MKPinAnnotationView(annotation: annotation, reuseIdentifier: identifier)
+            
+                view = MKAnnotationView(annotation: annotation, reuseIdentifier: identifier)
+                view.image = UIImage(named: "car.png")
+                view.frame.size.height = 30
+                view.frame.size.width = 30
+                view.contentMode = UIViewContentMode.ScaleAspectFit
                 view.canShowCallout = true
                 view.calloutOffset = CGPoint(x: -5, y: 5)
                 view.rightCalloutAccessoryView = UIButton(type: .DetailDisclosure) as UIView
-            }
+                
+//            }
             return view
+        } else if let annotation = annotation as? Passenger {
+            let identifier = "passenger"
+            
+            let view = PassengerView(annotation: annotation, reuseIdentifier: identifier)
+            
+            view.frame.size.width = 30
+            view.frame.size.height = 30
+            view.backgroundColor = UIColor.clearColor()
+            
+            passengerViews[annotation] = view
+            
+//            view = MKAnnotationView(annotation: annotation, reuseIdentifier: identifier)
+//            view.image = UIImage(named: "car.png")
+//            view.frame.size.height = 30
+//            view.frame.size.width = 30
+//            view.contentMode = UIViewContentMode.ScaleAspectFit
+//            view.canShowCallout = true
+//            view.calloutOffset = CGPoint(x: -5, y: 5)
+//            view.rightCalloutAccessoryView = UIButton(type: .DetailDisclosure) as UIView
+
+            return view
+            
         }
         return nil
+    }
+    
+    func mapView(mapView: MKMapView, didSelectAnnotationView view: MKAnnotationView) {
+        print("did select annotation view")
+        print(mapView.selectedAnnotations)
+        
+        if let car = view.annotation as? Car {
+            return selectCar(car, viewForCar: view, mapView: mapView)
+            
+        } else if let passenger = view.annotation as? Passenger {
+            if let passengerView = view as? PassengerView {
+                return selectPassenger(passenger, viewForPassenger: passengerView, mapView: mapView)
+            }
+            
+        }
+    }
+    
+    func selectCar(car: Car, viewForCar: MKAnnotationView, mapView: MKMapView) {
+        if currentSelectedView == nil {
+            currentSelectedView = viewForCar
+            viewForCar.layer.borderColor = UIColor.blueColor().CGColor
+            viewForCar.layer.borderWidth = 5
+            
+            // view routes to each passenger
+            currentSelectedOverlays = []
+            let carPlacemark = MKPlacemark(coordinate: car.coordinate, addressDictionary: nil)
+            for (p, _) in passengerViews {
+                let directionsRequest = MKDirectionsRequest()
+                let pickup = MKPlacemark(coordinate: p.coordinate, addressDictionary: nil)
+                
+                directionsRequest.source = MKMapItem(placemark: carPlacemark)
+                directionsRequest.destination = MKMapItem(placemark: pickup)
+                directionsRequest.transportType = MKDirectionsTransportType.Automobile
+                let directions = MKDirections(request: directionsRequest)
+                
+                directions.calculateDirectionsWithCompletionHandler {
+                    (response:MKDirectionsResponse?, error:NSError?) -> Void in
+                    if error == nil {
+                        let route = response!.routes[0]
+                        self.currentSelectedOverlays.append(route)
+                        
+                        self.myMap.addOverlay(route.polyline)
+                    }
+                }
+            }
+            
+            
+        } else {
+            currentSelectedView = nil
+            for route in currentSelectedOverlays {
+                self.myMap.removeOverlay(route.polyline)
+            }
+            mapView.deselectAnnotation(car, animated: true)
+            viewForCar.layer.borderColor = UIColor.clearColor().CGColor
+        }
+    }
+    
+    func selectPassenger(passenger: Passenger, viewForPassenger: PassengerView, mapView: MKMapView) {
+        if let car = currentSelectedView.annotation as? Car {
+            
+        }
     }
     
     override func didReceiveMemoryWarning() {

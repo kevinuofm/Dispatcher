@@ -11,11 +11,11 @@ import MapKit
 
 class Car: NSObject, MKAnnotation {
     let coordinate: CLLocationCoordinate2D
-    let passengers: [NSObject]
+    let passengers: [Passenger]
     let waypoints: [NSObject]
     let title: String?
     
-    init(title: String, coordinate:CLLocationCoordinate2D, passengers: [NSObject], waypoints: [NSObject]) {
+    init(title: String, coordinate:CLLocationCoordinate2D, passengers: [Passenger], waypoints: [NSObject]) {
         self.coordinate = coordinate
         self.passengers = passengers
         self.waypoints = waypoints
@@ -24,5 +24,4 @@ class Car: NSObject, MKAnnotation {
         super.init()
     }
     
-
 }
