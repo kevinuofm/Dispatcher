@@ -9,19 +9,47 @@
 import UIKit
 import MapKit
 
-class Car: NSObject, MKAnnotation {
-    let coordinate: CLLocationCoordinate2D
-    let passengers: [Passenger]
-    let waypoints: [NSObject]
-    let title: String?
+class Car: MKPointAnnotation {
+    var passengers: [Passenger]
+    var coordWaypoints: [CLLocationCoordinate2D] = []
+    var counter = 0
     
-    init(title: String, coordinate:CLLocationCoordinate2D, passengers: [Passenger], waypoints: [NSObject]) {
-        self.coordinate = coordinate
+    init(title: String, coordinate:CLLocationCoordinate2D, passengers: [Passenger]) {
         self.passengers = passengers
-        self.waypoints = waypoints
-        self.title = title
-        
         super.init()
+        
+        self.coordinate = coordinate
+        self.title = title
+    }
+    
+    func addRouteToPassenger(passenger: Passenger, route: MKRoute) {
+        passengers.append(passenger)
+        
+        let waypointCount = route.polyline.pointCount
+        let range = NSMakeRange(0, waypointCount)
+        let coordsPointer = UnsafeMutablePointer<CLLocationCoordinate2D>.alloc(waypointCount)
+
+        route.polyline.getCoordinates(coordsPointer, range: range)
+        
+        for i in 0..<waypointCount {
+            coordWaypoints.append(coordsPointer[i])
+        }
+        
+    }
+    
+    func onTick(timer: NSTimer) {
+        if (counter < coordWaypoints.count) {
+            UIView.animateWithDuration(0.4, animations: { () -> Void in
+                self.coordinate = self.coordWaypoints[self.counter]
+            })
+            print (self.coordinate)
+            counter++
+        } else {
+            for p in passengers {
+                
+            }
+        }
+        
     }
     
 }

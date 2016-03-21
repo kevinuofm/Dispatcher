@@ -20,9 +20,9 @@ class ViewController: UIViewController, MKMapViewDelegate {
     var gameTimer: NSTimer!
     var isPaused = true
     var passengerViews = [Passenger:PassengerView]()
-    var carViews = [Car]()
+    var carViews = [Car:MKAnnotationView]()
     var currentSelectedView: MKAnnotationView!
-    var currentSelectedOverlays = [MKRoute]()
+    var currentSelectedOverlays = [Passenger:MKRoute]()
     let mapCenter = CLLocationCoordinate2DMake(37.773692,-122.4297367)
     
     override func viewDidLoad() {
@@ -34,8 +34,7 @@ class ViewController: UIViewController, MKMapViewDelegate {
         let car = Car(
             title: "test",
             coordinate: CLLocationCoordinate2DMake(37.7636844,-122.4216257),
-            passengers: [],
-            waypoints: [])
+            passengers: [])
         
         myMap.addAnnotation(car)
         
@@ -59,6 +58,11 @@ class ViewController: UIViewController, MKMapViewDelegate {
             } else {
                 pv.setNeedsDisplay()
             }
+        }
+        
+        for (car, carView) in carViews {
+            car.onTick(timer)
+//            carView.setNeedsDisplay()
         }
         
     }
@@ -131,6 +135,8 @@ class ViewController: UIViewController, MKMapViewDelegate {
                 view.rightCalloutAccessoryView = UIButton(type: .DetailDisclosure) as UIView
                 
 //            }
+            print(identifier)
+            carViews[annotation] = view
             return view
         } else if let annotation = annotation as? Passenger {
             let identifier = "passenger"
@@ -172,6 +178,11 @@ class ViewController: UIViewController, MKMapViewDelegate {
             
         }
     }
+    func resetCarToPassengerOverlays() {
+        for (_,route) in currentSelectedOverlays {
+            self.myMap.removeOverlay(route.polyline)
+        }
+    }
     
     func selectCar(car: Car, viewForCar: MKAnnotationView, mapView: MKMapView) {
         if currentSelectedView == nil {
@@ -180,7 +191,7 @@ class ViewController: UIViewController, MKMapViewDelegate {
             viewForCar.layer.borderWidth = 5
             
             // view routes to each passenger
-            currentSelectedOverlays = []
+            resetCarToPassengerOverlays()
             let carPlacemark = MKPlacemark(coordinate: car.coordinate, addressDictionary: nil)
             for (p, _) in passengerViews {
                 let directionsRequest = MKDirectionsRequest()
@@ -195,7 +206,7 @@ class ViewController: UIViewController, MKMapViewDelegate {
                     (response:MKDirectionsResponse?, error:NSError?) -> Void in
                     if error == nil {
                         let route = response!.routes[0]
-                        self.currentSelectedOverlays.append(route)
+                        self.currentSelectedOverlays[p] = route
                         
                         self.myMap.addOverlay(route.polyline)
                     }
@@ -205,9 +216,7 @@ class ViewController: UIViewController, MKMapViewDelegate {
             
         } else {
             currentSelectedView = nil
-            for route in currentSelectedOverlays {
-                self.myMap.removeOverlay(route.polyline)
-            }
+            resetCarToPassengerOverlays()
             mapView.deselectAnnotation(car, animated: true)
             viewForCar.layer.borderColor = UIColor.clearColor().CGColor
         }
@@ -215,7 +224,11 @@ class ViewController: UIViewController, MKMapViewDelegate {
     
     func selectPassenger(passenger: Passenger, viewForPassenger: PassengerView, mapView: MKMapView) {
         if let car = currentSelectedView.annotation as? Car {
-            
+            car.passengers.append(passenger)
+            if let carToPassengerOverlay = currentSelectedOverlays[passenger] {
+                car.addRouteToPassenger(passenger, route: carToPassengerOverlay)
+            }
+            resetCarToPassengerOverlays()
         }
     }
     
