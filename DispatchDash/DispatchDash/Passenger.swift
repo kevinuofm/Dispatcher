@@ -19,6 +19,7 @@ class Passenger: NSObject, MKAnnotation {
     let directions: MKDirections
     var mapRoute: MKRoute!
     var waitTime = 0
+    var pickedUpBy: Car?
     var isPaxLapsed: Bool {
         return waitTime >= waitMax
     }

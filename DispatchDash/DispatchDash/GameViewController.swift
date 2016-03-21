@@ -33,8 +33,7 @@ class GameViewController: UIViewController, MKMapViewDelegate {
         
         let car = Car(
             title: "test",
-            coordinate: CLLocationCoordinate2DMake(37.7636844,-122.4216257),
-            passengers: [])
+            coordinate: CLLocationCoordinate2DMake(37.7636844,-122.4216257))
         
         myMap.addAnnotation(car)
         
@@ -51,7 +50,7 @@ class GameViewController: UIViewController, MKMapViewDelegate {
         
         for (p, pv) in passengerViews {
             p.onTick(timer)
-            if p.isPaxLapsed {
+            if p.isPaxLapsed || p.pickedUpBy != nil {
                 myMap.removeAnnotation(p)
                 passengerViews.removeValueForKey(p)
                 myMap.removeOverlay(p.mapRoute.polyline)
@@ -130,10 +129,10 @@ class GameViewController: UIViewController, MKMapViewDelegate {
                 view.frame.size.height = 30
                 view.frame.size.width = 30
                 view.contentMode = UIViewContentMode.ScaleAspectFit
-                view.canShowCallout = true
-                view.calloutOffset = CGPoint(x: -5, y: 5)
-                view.rightCalloutAccessoryView = UIButton(type: .DetailDisclosure) as UIView
-                
+//                view.canShowCallout = true
+//                view.calloutOffset = CGPoint(x: -5, y: 5)
+//                view.rightCalloutAccessoryView = UIButton(type: .DetailDisclosure) as UIView
+            
 //            }
             print(identifier)
             carViews[annotation] = view
