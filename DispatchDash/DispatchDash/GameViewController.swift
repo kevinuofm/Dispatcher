@@ -10,7 +10,7 @@ import UIKit
 import MapKit
 import CoreLocation
 
-class ViewController: UIViewController, MKMapViewDelegate {
+class GameViewController: UIViewController, MKMapViewDelegate {
     
     @IBOutlet weak var myMap: MKMapView!
     @IBOutlet weak var pauseResumeButton: UIButton!
