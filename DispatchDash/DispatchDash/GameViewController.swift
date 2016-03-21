@@ -52,8 +52,10 @@ class GameViewController: UIViewController, MKMapViewDelegate {
             p.onTick(timer)
             if p.isPaxLapsed || p.pickedUpBy != nil {
                 myMap.removeAnnotation(p)
-                passengerViews.removeValueForKey(p)
-                myMap.removeOverlay(p.mapRoute.polyline)
+                if (p.pickedUpBy == nil) {
+                    passengerViews.removeValueForKey(p)
+                    myMap.removeOverlay(p.mapRoute.polyline)
+                }
             } else {
                 pv.setNeedsDisplay()
             }
